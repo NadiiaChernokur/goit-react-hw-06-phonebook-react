@@ -2,7 +2,8 @@ import { Formik, Field } from 'formik';
 import { FormButton, FormContainer } from './Contactform.styles';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { addContact } from 'components/redux/contactsSlice';
+import { addContact } from 'redux/contactsSlice';
+import { nanoid } from '@reduxjs/toolkit';
 
 export const ContactForm = () => {
   const dispatch = useDispatch();
@@ -16,17 +17,20 @@ export const ContactForm = () => {
           number: '',
         }}
         onSubmit={(values, actions) => {
-          const surchName = contacts.map(contactName => contactName.name);
-          if (surchName.includes(values.name)) {
+          const names = contacts.map(contact => contact.name.toLowerCase());
+          const valueName = values.name;
+
+          if (names.find(name => name === valueName.toLowerCase())) {
             alert(`${values.name} is already in contacts`);
             return;
           }
+
           if (values.name === '' || values.number === '') {
             alert(`There are empty fields`);
             return;
           }
 
-          dispatch(addContact(values));
+          dispatch(addContact({ ...values, id: nanoid() }));
           actions.resetForm();
         }}
       >
